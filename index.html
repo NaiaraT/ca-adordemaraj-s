@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qual é o Presidente do Brasil?</title>
+    <!-- Inclui Tailwind CSS para estilização responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define a fonte Inter para todo o corpo do documento */
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Estilos adicionais para centralizar e dar um visual agradável */
+        .container-game {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f3f4f6; /* Cor de fundo suave */
+        }
+        /* Estilo para a linha do tempo */
+        .timeline-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .timeline-year {
+            font-weight: bold;
+            color: #333;
+            white-space: nowrap; /* Garante que o ano não quebre */
+        }
+        .timeline-line {
+            flex-grow: 1;
+            height: 2px;
+            background-color: #60a5fa; /* Cor azul suave */
+            margin: 0 10px;
+        }
+        .timeline-description {
+            font-style: italic;
+            color: #555;
+            margin-top: 5px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="container-game">
+    <div class="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-11/12 max-w-lg mx-auto flex flex-col items-center">
+        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-6 text-center">Qual é o Presidente?</h1>
+        <div id="game-area" class="w-full">
+            <p id="initial-hint" class="text-lg text-gray-700 italic mb-6 text-center"></p>
+
+            <!-- Imagem do presidente, inicialmente oculta -->
+            <!-- O atributo onerror foi removido para evitar o erro persistente com data:image/svg+xml -->
+            <img id="president-image" src="" alt="Imagem do Presidente" 
+                 class="hidden w-32 h-32 object-cover rounded-full mx-auto mb-6 border-4 border-blue-300 shadow-md">
+
+            <input type="text" id="guess-input" placeholder="Digite o nome do presidente"
+                   class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
+            
+            <button id="submit-guess"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mb-4">
+                Adivinhar
+            </button>
+            
+            <p id="feedback" class="text-center font-bold text-lg mb-6"></p>
+
+            <div class="hints-area grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="periodo">
+                    Período de Governo
+                </button>
+                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="curiosidades">
+                    Curiosidades
+                </button>
+                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="projeto">
+                    Principal Projeto de Governo
+                </button>
+                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="sofremos">
+                    Sofremos Até Hoje
+                </button>
+            </div>
+            <p id="current-hint-display" class="bg-gray-100 p-4 rounded-lg border border-gray-200 text-gray-700 text-base"></p>
+        </div>
+        <button id="new-game-button"
+                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mt-6"
+                style="display: none;">
+            Próximo Presidente
+        </button>
+    </div>
+
+    <script>
+        // Array de objetos contendo os dados de cada presidente
+        // Você pode adicionar mais presidentes aqui, seguindo o mesmo formato
+        const presidents = [
+            {
+                name: "Marechal Deodoro da Fonseca",
+                initialHint: "Se, por dez vezes, tentaram nos estrangular, dez vezes recuamos e resistimos.",
+                periodo: "1889-1891 (Proclamação da República e primeiro presidente)",
+                curiosidades: "Foi o primeiro presidente do Brasil após a Proclamação da República. Renunciou ao cargo.",
+                projeto: "Proclamação da República e consolidação do regime republicano.",
+                sofremos: "A instabilidade política e a falta de participação popular nos primeiros anos da República, que se arrastaram por décadas.",
+                legacySummary: "O proclamador da República, que enfrentou a consolidação do novo regime com desafios e renúncias.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Deodoro" // Exemplo de URL de imagem
+            },
+            {
+                name: "Floriano Peixoto",
+                initialHint: "É preciso que a Nação saiba que a República é forte e que a ordem será mantida.",
+                periodo: "1891-1894 (O 'Marechal de Ferro')",
+                curiosidades: "Conhecido como 'Marechal de Ferro' pela sua rigidez. Enfrentou a Revolta da Armada e a Revolução Federalista.",
+                projeto: "Consolidação da República e defesa do regime contra movimentos monarquistas e federalistas.",
+                sofremos: "A centralização do poder e a repressão a opositores, que em certos momentos suprimiu liberdades.",
+                legacySummary: "O 'Marechal de Ferro' que consolidou a República, mas com forte centralização e repressão.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Floriano" // Exemplo de URL de imagem
+            },
+            {
+                name: "Campos Sales",
+                initialHint: "É na política do café com leite que reside a segurança da República.",
+                periodo: "1898-1902 (Política dos Governadores)",
+                curiosidades: "Idealizou e implementou a 'Política dos Governadores' para garantir a estabilidade política.",
+                projeto: "Ajuste financeiro e estabilização da economia através de empréstimos e renegociação de dívidas externas.",
+                sofremos: "Aprofundamento da dependência econômica e política dos estados, resultando em oligarquias regionais e exclusão social.",
+                legacySummary: "O arquiteto da 'Política dos Governadores' e da estabilização financeira, que consolidou o poder das oligarquias.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Campos+Sales" // Exemplo de URL de imagem
+            },
+            {
+                name: "Rodrigues Alves",
+                initialHint: "A saúde pública é a base da prosperidade nacional.",
+                periodo: "1902-1906",
+                curiosidades: "Ficou conhecido pela Reforma Urbana do Rio de Janeiro e pela Campanha de Vacinação Obrigatória.",
+                projeto: "Reforma urbana e sanitária do Rio de Janeiro (Bota-Abaixo), combate a doenças como febre amarela e varíola.",
+                sofremos: "A violência e a repressão na implementação da vacinação obrigatória, gerando a Revolta da Vacina.",
+                legacySummary: "O presidente da modernização sanitária e urbana do Rio de Janeiro, que enfrentou a Revolta da Vacina.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Rodrigues+Alves" // Exemplo de URL de imagem
+            },
+            {
+                name: "Afonso Pena",
+                initialHint: "Governar é povoar.",
+                periodo: "1906-1909",
+                curiosidades: "Foi o primeiro presidente a viajar de trem para o interior do país. Morreu no cargo.",
+                projeto: "Incentivo à imigração e à colonização, expansão da malha ferroviária e criação da Caixa de Conversão.",
+                sofremos: "Ainda persistia a dependência da economia cafeeira e a exclusão social no campo.",
+                legacySummary: "O presidente que focou no desenvolvimento ferroviário e na imigração, buscando o povoamento do interior.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Afonso+Pena" // Exemplo de URL de imagem
+            },
+            {
+                name: "Nilo Peçanha",
+                initialHint: "A instrução é a base da grandeza dos povos.",
+                periodo: "1909-1910",
+                curiosidades: "Primeiro e único presidente mulato do Brasil. Assumiu após a morte de Afonso Pena.",
+                projeto: "Criação do Ministério da Agricultura, Indústria e Comércio e das Escolas de Aprendizes Artífices (futuros IFs).",
+                sofremos: "A curta duração de seu mandato impediu a consolidação de muitas de suas propostas sociais e educacionais.",
+                legacySummary: "O presidente que impulsionou a educação técnica e a agricultura, buscando a modernização do país.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Nilo+Pecanha" // Exemplo de URL de imagem
+            },
+            {
+                name: "Hermes da Fonseca",
+                initialHint: "A República não é um privilégio, é um dever.",
+                periodo: "1910-1914",
+                curiosidades: "Marechal, liderou a 'Política das Salvações' para intervir em estados e combater oligarquias.",
+                projeto: "Reforma militar, criação da Escola Militar do Realengo, e intervenção em estados para moralizar a política.",
+                sofremos: "A 'Política das Salvações' gerou conflitos e instabilidade em diversos estados, com forte repressão.",
+                legacySummary: "O marechal que tentou moralizar a política através de intervenções, gerando conflitos e resistência.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Hermes+Fonseca" // Exemplo de URL de imagem
+            },
+            {
+                name: "Venceslau Brás",
+                initialHint: "A neutralidade é a nossa força.",
+                periodo: "1914-1918",
+                curiosidades: "Governou durante a Primeira Guerra Mundial, mantendo o Brasil neutro até o final.",
+                projeto: "Estabilização econômica, criação do Banco do Brasil e investimentos em infraestrutura, apesar da guerra.",
+                sofremos: "A gripe espanhola, que devastou o país no final de seu mandato, revelando a fragilidade da saúde pública.",
+                legacySummary: "O presidente que conduziu o Brasil durante a Primeira Guerra Mundial, buscando a neutralidade e a estabilidade.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Venceslau+Bras" // Exemplo de URL de imagem
+            },
+            {
+                name: "Delfim Moreira",
+                initialHint: "A ordem é a base do progresso.",
+                periodo: "1918-1919 (interino)",
+                curiosidades: "Assumiu interinamente após a morte de Rodrigues Alves (eleito, mas não empossado). Sofria de doença mental.",
+                projeto: "Governo de transição, sem grandes projetos devido à sua saúde e ao curto período.",
+                sofremos: "A instabilidade política gerada pela sua condição de saúde e a transição conturbada de poder.",
+                legacySummary: "O presidente interino que enfrentou um período de transição política e de saúde frágil.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Delfim+Moreira" // Exemplo de URL de imagem
+            },
+            {
+                name: "Epitácio Pessoa",
+                initialHint: "Ainda que o Brasil seja um país tropical, não deve ser uma nação tropicalista.",
+                periodo: "1919-1922",
+                curiosidades: "Eleito enquanto estava na Conferência de Paz de Paris. Foi o primeiro presidente paraibano.",
+                projeto: "Investimentos em infraestrutura no Nordeste, saneamento básico e modernização do exército.",
+                sofremos: "A crise econômica pós-guerra e a eclosão do movimento tenentista, que questionava a República Velha.",
+                legacySummary: "O presidente que buscou modernizar o Nordeste e o exército, mas enfrentou a crise pós-guerra e o tenentismo.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Epitacio+Pessoa" // Exemplo de URL de imagem
+            },
+            {
+                name: "Artur Bernardes",
+                initialHint: "A política é a arte do possível.",
+                periodo: "1922-1926",
+                curiosidades: "Governou sob estado de sítio por grande parte do mandato devido a revoltas militares.",
+                projeto: "Combate ao tenentismo e estabilização política, buscando a ordem e o controle do governo.",
+                sofremos: "A forte repressão política e a perseguição a opositores, que marcaram seu governo autoritário.",
+                legacySummary: "O presidente que governou sob estado de sítio, marcado pela repressão e pelo combate aos movimentos militares.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Artur+Bernardes" // Exemplo de URL de imagem
+            },
+            {
+                name: "Washington Luís",
+                initialHint: "Governar é abrir estradas.",
+                periodo: "1926-1930",
+                curiosidades: "Último presidente da República Velha, deposto pela Revolução de 1930.",
+                projeto: "Vasta construção de rodovias (política rodoviária), visando a integração nacional e o escoamento da produção.",
+                sofremos: "A crise econômica de 1929 e a quebra da política do café com leite, que levaram à Revolução de 1930.",
+                legacySummary: "O presidente das estradas, que buscou a modernização do transporte, mas foi deposto pela Revolução de 1930.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Washington+Luis" // Exemplo de URL de imagem
+            },
+            {
+                name: "Getúlio Vargas",
+                initialHint: "Trabalhadores do Brasil!",
+                periodo: "1930-1945 e 1951-1954 (Era Vargas)",
+                curiosidades: "Governou por 15 anos consecutivos, com o Estado Novo, e depois foi eleito democraticamente. Cometeu suicídio.",
+                projeto: "Criação da CLT (Consolidação das Leis do Trabalho), criação de empresas estatais como a Petrobras e Vale.",
+                sofremos: "O autoritarismo do Estado Novo, a censura e a perseguição política, que suprimiram a democracia por anos.",
+                legacySummary: "O líder da Era Vargas, que modernizou o Brasil, criou leis trabalhistas, mas também impôs um regime autoritário.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Getulio+Vargas" // Exemplo de URL de imagem
+            },
+            {
+                name: "José Linhares",
+                initialHint: "A transição é o caminho para a democracia.",
+                periodo: "1945-1946 (interino)",
+                curiosidades: "Presidente do Supremo Tribunal Federal, assumiu interinamente após a queda de Vargas.",
+                projeto: "Governo de transição para a redemocratização, convocando eleições e garantindo a ordem.",
+                sofremos: "A curta duração e o caráter provisório de seu governo limitaram sua capacidade de grandes transformações.",
+                legacySummary: "O presidente interino que conduziu o Brasil na transição da Era Vargas para a redemocratização.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Jose+Linhares" // Exemplo de URL de imagem
+            },
+            {
+                name: "Eurico Gaspar Dutra",
+                initialHint: "A democracia é a nossa bandeira.",
+                periodo: "1946-1951",
+                curiosidades: "Primeiro presidente eleito após a queda de Vargas. Promulgou a Constituição de 1946.",
+                projeto: "Plano SALTE (Saúde, Alimentação, Transporte e Energia), buscando o desenvolvimento econômico e social.",
+                sofremos: "A abertura econômica excessiva que prejudicou a indústria nacional e a perseguição ao Partido Comunista.",
+                legacySummary: "O presidente da redemocratização, que buscou o desenvolvimento através do Plano SALTE, mas enfrentou desafios econômicos.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Eurico+Dutra" // Exemplo de URL de imagem
+            },
+            {
+                name: "Café Filho",
+                initialHint: "A legalidade é o meu lema.",
+                periodo: "1954-1955 (interino)",
+                curiosidades: "Vice de Vargas, assumiu após o suicídio. Afastou-se por motivos de saúde.",
+                projeto: "Governo de transição em um período de grande instabilidade política após a morte de Vargas.",
+                sofremos: "A instabilidade política e as crises sucessórias que marcaram o período pós-Vargas.",
+                legacySummary: "O presidente interino que assumiu em um momento de crise, buscando a legalidade em meio à instabilidade.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Cafe+Filho" // Exemplo de URL de imagem
+            },
+            {
+                name: "Carlos Luz",
+                initialHint: "A Constituição acima de tudo.",
+                periodo: "1955 (interino, por poucos dias)",
+                curiosidades: "Presidente da Câmara dos Deputados, assumiu interinamente e foi deposto pelo 'Contragolpe Preventivo'.",
+                projeto: "Governo de curtíssima duração, marcado pela tentativa de impedir a posse de Juscelino Kubitschek.",
+                sofremos: "A instabilidade política e as manobras para impedir a posse de presidentes eleitos, fragilizando a democracia.",
+                legacySummary: "O presidente interino que teve um breve e conturbado mandato, marcado por tentativas de golpe.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Carlos+Luz" // Exemplo de URL de imagem
+            },
+            {
+                name: "Nereu Ramos",
+                initialHint: "A nação deve ter tranquilidade para seguir seu destino.",
+                periodo: "1955-1956 (interino)",
+                curiosidades: "Presidente do Senado, assumiu após a deposição de Carlos Luz, garantindo a posse de JK.",
+                projeto: "Governo de transição que assegurou a posse de Juscelino Kubitschek, fundamental para a estabilidade democrática.",
+                sofremos: "Ainda que tenha garantido a posse, a fragilidade institucional da época abria precedentes para futuras crises.",
+                legacySummary: "O presidente interino que foi crucial para garantir a posse de JK, estabilizando o cenário político.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Nereu+Ramos" // Exemplo de URL de imagem
+            },
+            {
+                name: "Juscelino Kubitschek",
+                initialHint: "50 anos em 5.",
+                periodo: "1956-1961 (Anos Dourados)",
+                curiosidades: "Foi o presidente que construiu Brasília. Seu governo ficou conhecido pelos 'Anos Dourados'.",
+                projeto: "Construção de Brasília, Plano de Metas para o desenvolvimento industrial e rodoviário.",
+                sofremos: "A inflação e o endividamento externo para financiar as grandes obras, deixando um legado de problemas econômicos.",
+                legacySummary: "O presidente da Bossa Nova e da construção de Brasília, que impulsionou o desenvolvimento, mas com alto custo econômico.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Juscelino+Kubitschek" // Exemplo de URL de imagem
+            },
+            {
+                name: "Jânio Quadros",
+                initialHint: "Varro a corrupção.",
+                periodo: "1961 (7 meses)",
+                curiosidades: "Eleito com votação expressiva, renunciou ao cargo em menos de um ano.",
+                projeto: "Medidas moralizadoras e combate à corrupção, mas com estilo personalista e polêmico.",
+                sofremos: "A renúncia inesperada gerou uma crise política e institucional que culminou no golpe de 1964.",
+                legacySummary: "O presidente da vassoura, que renunciou ao cargo, mergulhando o país em profunda crise política.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Janio+Quadros" // Exemplo de URL de imagem
+            },
+            {
+                name: "Ranieri Mazzilli",
+                initialHint: "A Constituição é a bússola da nação.",
+                periodo: "1961 (interino, por dias) e 1964 (interino, por dias)",
+                curiosidades: "Presidente da Câmara dos Deputados, assumiu interinamente duas vezes em momentos de crise.",
+                projeto: "Governos de transição em momentos de grande instabilidade, sem grandes projetos próprios.",
+                sofremos: "A fragilidade política que exigia a atuação de presidentes interinos em momentos críticos da história.",
+                legacySummary: "O presidente interino em duas ocasiões de crise, representando a fragilidade institucional da época.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Ranieri+Mazzilli" // Exemplo de URL de imagem
+            },
+            {
+                name: "João Goulart",
+                initialHint: "A política nacional é o resultado da luta de classes.",
+                periodo: "1961-1964 (Deposto pela Ditadura Militar)",
+                curiosidades: "O último presidente antes do golpe militar de 1964. Defendia as Reformas de Base.",
+                projeto: "Tentativa de implementar as Reformas de Base (agrária, urbana, bancária, eleitoral), visando maior justiça social.",
+                sofremos: "A polarização política e a instabilidade que levaram ao golpe militar de 1964, instaurando um longo período de ditadura.",
+                legacySummary: "O presidente deposto pelo golpe de 64, que buscava reformas sociais, mas enfrentou forte oposição e instabilidade.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Joao+Goulart" // Exemplo de URL de imagem
+            },
+            {
+                name: "Humberto Castelo Branco",
+                initialHint: "A Revolução não tem prazo para acabar.",
+                periodo: "1964-1967 (Ditadura Militar)",
+                curiosidades: "Primeiro presidente do regime militar. Instituiu o bipartidarismo e o AI-2.",
+                projeto: "Reorganização econômica (PAEG), combate à inflação e criação de instituições do regime militar.",
+                sofremos: "O início da repressão política, a cassação de direitos e a supressão da democracia.",
+                legacySummary: "O primeiro presidente da ditadura militar, que iniciou a repressão e a reorganização do Estado.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Castelo+Branco" // Exemplo de URL de imagem
+            },
+            {
+                name: "Artur da Costa e Silva",
+                initialHint: "O Brasil é um país que não tem tempo a perder.",
+                periodo: "1967-1969 (Ditadura Militar)",
+                curiosidades: "General, endureceu o regime militar com o Ato Institucional nº 5 (AI-5).",
+                projeto: "Obras de infraestrutura (Ponte Rio-Niterói), mas com forte repressão política e censura.",
+                sofremos: "O período mais duro da ditadura militar, com o AI-5, tortura e perseguição a opositores.",
+                legacySummary: "O presidente que endureceu a ditadura militar, marcando o período mais repressivo do regime.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Costa+e+Silva" // Exemplo de URL de imagem
+            },
+            {
+                name: "Emílio Médici",
+                initialHint: "Onde há um brasileiro, há um Brasil.",
+                periodo: "1969-1974 (Ditadura Militar - 'Milagre Econômico')",
+                curiosidades: "Governou durante o auge do 'Milagre Econômico' e da repressão política.",
+                projeto: "Grandes obras (Transamazônica), Copa do Mundo de 1970, e forte crescimento econômico.",
+                sofremos: "A intensificação da repressão política e da tortura, em paralelo com o 'milagre' econômico.",
+                legacySummary: "O presidente do 'Milagre Econômico' e da repressão mais intensa da ditadura militar.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Emilio+Medici" // Exemplo de URL de imagem
+            },
+            {
+                name: "Ernesto Geisel",
+                initialHint: "A abertura lenta, gradual e segura.",
+                periodo: "1974-1979 (Ditadura Militar - Abertura)",
+                curiosidades: "Iniciou o processo de abertura política, mas enfrentou resistência de militares 'linha dura'.",
+                projeto: "Início da distensão e abertura política, buscando a transição para a democracia.",
+                sofremos: "A lentidão e as contradições do processo de abertura, que ainda permitiam abusos e resistências à democracia.",
+                legacySummary: "O presidente que iniciou a abertura política, buscando uma transição gradual para a democracia.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Ernesto+Geisel" // Exemplo de URL de imagem
+            },
+            {
+                name: "João Figueiredo",
+                initialHint: "Para fazer a abertura, eu prendo e arrebento.",
+                periodo: "1979-1985 (Ditadura Militar - Fim)",
+                curiosidades: "Último presidente militar. Promulgou a Lei da Anistia e enfrentou a campanha Diretas Já.",
+                projeto: "Consolidação da abertura política, Lei da Anistia e transição para o governo civil.",
+                sofremos: "A crise econômica, a inflação e a dívida externa, que marcaram o fim da ditadura militar.",
+                legacySummary: "O último presidente militar, que concluiu a abertura política e a transição para a democracia.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Joao+Figueiredo" // Exemplo de URL de imagem
+            },
+            {
+                name: "José Sarney",
+                initialHint: "A Constituição é a alma da nação.",
+                periodo: "1985-1990 (Nova República)",
+                curiosidades: "Primeiro presidente civil após a ditadura militar. Assumiu após a morte de Tancredo Neves.",
+                projeto: "Promulgação da Constituição de 1988, Plano Cruzado (combate à inflação) e início da Nova República.",
+                sofremos: "A hiperinflação, os planos econômicos fracassados e a instabilidade política nos primeiros anos da Nova República.",
+                legacySummary: "O primeiro presidente civil pós-ditadura, que promulgou a Constituição de 88, mas enfrentou a hiperinflação.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Jose+Sarney" // Exemplo de URL de imagem
+            },
+            {
+                name: "Fernando Collor de Mello",
+                initialHint: "Caçador de Marajás.",
+                periodo: "1990-1992 (Impeachment)",
+                curiosidades: "Primeiro presidente eleito por voto direto após a ditadura. Sofreu impeachment.",
+                projeto: "Plano Collor (combate à inflação), abertura econômica e privatizações.",
+                sofremos: "O confisco das poupanças, a hiperinflação e o processo de impeachment por corrupção.",
+                legacySummary: "O 'caçador de marajás' que confiscou poupanças e sofreu impeachment por corrupção.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Fernando+Collor" // Exemplo de URL de imagem
+            },
+            {
+                name: "Itamar Franco",
+                initialHint: "O Brasil é maior que seus problemas.",
+                periodo: "1992-1995",
+                curiosidades: "Assumiu após o impeachment de Collor. Lançou as bases para o Plano Real.",
+                projeto: "Criação do Plano Real (iniciado por FHC, seu Ministro da Fazenda), estabilizando a economia.",
+                sofremos: "A instabilidade política e a desconfiança inicial do mercado após o impeachment de Collor.",
+                legacySummary: "O presidente que conduziu a transição pós-impeachment e lançou as bases para o Plano Real.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Itamar+Franco" // Exemplo de URL de imagem
+            },
+            {
+                name: "Fernando Henrique Cardoso",
+                initialHint: "A inflação é o imposto mais cruel que um povo pode pagar.",
+                periodo: "1995-2002 (Plano Real)",
+                curiosidades: "Foi um sociólogo renomado antes de ser presidente. Criou o Plano Real, que estabilizou a economia.",
+                projeto: "Plano Real (estabilização da moeda e controle da inflação), privatizações e reformas estruturais.",
+                sofremos: "As privatizações de empresas estatais, que geraram debates sobre a soberania nacional e o papel do Estado na economia.",
+                legacySummary: "O criador do Plano Real, que estabilizou a economia e promoveu privatizações, marcando uma nova era econômica.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=FHC" // Exemplo de URL de imagem
+            },
+            {
+                name: "Luiz Inácio Lula da Silva",
+                initialHint: "A esperança venceu o medo.",
+                periodo: "2003-2010 e 2023-presente",
+                curiosidades: "Foi o primeiro presidente de origem operária no Brasil. Criou programas sociais como o Bolsa Família.",
+                projeto: "Criação do Bolsa Família, políticas de inclusão social, crescimento econômico e valorização do salário mínimo.",
+                sofremos: "Escândalos de corrupção que mancharam a imagem do governo e afetaram a confiança nas instituições.",
+                legacySummary: "O presidente que ampliou programas sociais e impulsionou o crescimento econômico, mas enfrentou acusações de corrupção.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Lula" // Exemplo de URL de imagem
+            },
+            {
+                name: "Dilma Rousseff",
+                initialHint: "Não vamos passar!",
+                periodo: "2011-2016 (Impeachment)",
+                curiosidades: "Foi a primeira mulher a presidir o Brasil. Enfrentou um processo de impeachment.",
+                projeto: "Programas sociais como 'Minha Casa, Minha Vida' e expansão do acesso à educação superior com o Pronatec.",
+                sofremos: "A instabilidade política e a crise econômica que culminaram no seu impeachment, deixando um legado de profunda polarização.",
+                legacySummary: "A primeira mulher presidente, que expandiu programas sociais, mas teve seu mandato interrompido por impeachment.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Dilma" // Exemplo de URL de imagem
+            },
+            {
+                name: "Michel Temer",
+                initialHint: "A travessia é necessária.",
+                periodo: "2016-2018",
+                curiosidades: "Assumiu após o impeachment de Dilma Rousseff. Foi vice-presidente dela.",
+                projeto: "Reformas econômicas, como a Reforma Trabalhista e a PEC do Teto de Gastos.",
+                sofremos: "A impopularidade e as acusações de corrupção que marcaram seu governo pós-impeachment.",
+                legacySummary: "O presidente que assumiu após o impeachment de Dilma, implementando reformas econômicas impopulares.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Michel+Temer" // Exemplo de URL de imagem
+            },
+            {
+                name: "Jair Bolsonaro",
+                initialHint: "Brasil acima de tudo, Deus acima de todos.",
+                periodo: "2019-2022",
+                curiosidades: "Ex-militar, eleito em meio a uma onda conservadora e anti-establishment.",
+                projeto: "Reformas da Previdência, agenda liberal na economia e pautas conservadoras.",
+                sofremos: "A polarização política, a gestão da pandemia de COVID-19 e as tensões com as instituições democráticas.",
+                legacySummary: "O presidente que marcou uma guinada à direita, enfrentando forte polarização e desafios na gestão da pandemia.",
+                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Jair+Bolsonaro" // Exemplo de URL de imagem
+            }
+        ];
+
+        let currentPresidentIndex;
+        let currentPresident;
+
+        // Referências aos elementos DOM
+        const initialHintEl = document.getElementById('initial-hint');
+        const guessInputEl = document.getElementById('guess-input');
+        const submitGuessBtn = document.getElementById('submit-guess');
+        const feedbackEl = document.getElementById('feedback');
+        const hintButtons = document.querySelectorAll('.hint-button');
+        const currentHintDisplayEl = document.getElementById('current-hint-display');
+        const newGameButton = document.getElementById('new-game-button');
+        const presidentImageEl = document.getElementById('president-image'); // Referência ao elemento da imagem
+
+        /**
+         * Escolhe um presidente aleatório do array `presidents` para a rodada.
+         */
+        function chooseRandomPresident() {
+            currentPresidentIndex = Math.floor(Math.random() * presidents.length);
+            currentPresident = presidents[currentPresidentIndex];
+        }
+
+        /**
+         * Inicia uma nova rodada do jogo, reiniciando os elementos da interface.
+         */
+        function startGame() {
+            chooseRandomPresident(); // Seleciona um novo presidente
+            initialHintEl.textContent = currentPresident.initialHint; // Exibe a dica inicial
+            guessInputEl.value = ''; // Limpa o campo de chute
+            feedbackEl.textContent = ''; // Limpa a mensagem de feedback
+            currentHintDisplayEl.textContent = ''; // Limpa a dica atual exibida
+            
+            // Esconde e limpa a imagem do presidente
+            presidentImageEl.src = '';
+            presidentImageEl.classList.add('hidden');
+            
+            // Reabilita os elementos de entrada e botões de ação
+            guessInputEl.disabled = false;
+            submitGuessBtn.disabled = false;
+            hintButtons.forEach(button => button.disabled = false); // Garante que os botões de dica estejam sempre habilitados no início
+            newGameButton.style.display = 'none'; // Esconde o botão de 'Próximo Presidente'
+            feedbackEl.className = 'text-center font-bold text-lg mb-6'; // Reset CSS para feedback
+        }
+
+        /**
+         * Compara duas strings, permitindo um pequeno número de erros (typos).
+         * Considera similar se a distância de edição for pequena em relação ao tamanho da string mais curta.
+         * @param {string} str1 - Primeira string para comparação.
+         * @param {string} str2 - Segunda string para comparação.
+         * @param {number} toleranceFactor - Fator para determinar a tolerância (ex: 0.2 permite até 20% de erros).
+         * @returns {boolean} - Retorna true se as strings são consideradas similares, false caso contrário.
+         */
+        function isCloseEnough(str1, str2, toleranceFactor = 0.2) {
+            if (str1 === str2) return true; // Se forem idênticas, já é suficiente
+            if (str1.length === 0 || str2.length === 0) return false; // Se uma estiver vazia e a outra não
+
+            const longer = str1.length > str2.length ? str1 : str2;
+            const shorter = str1.length > str2.length ? str2 : str1;
+
+            // Define a distância máxima de erro permitida baseada no tamanho da string mais curta
+            const maxAllowedMismatches = Math.floor(shorter.length * toleranceFactor);
+
+            let mismatches = 0;
+            // Conta as diferenças de caracteres nas posições correspondentes
+            for (let i = 0; i < shorter.length; i++) {
+                if (shorter[i] !== longer[i]) {
+                    mismatches++;
+                }
+            }
+            // Adiciona a diferença de comprimento como mais mismatches
+            mismatches += (longer.length - shorter.length);
+
+            return mismatches <= maxAllowedMismatches;
+        }
+
+        /**
+         * Gera o HTML para uma linha do tempo simples a partir do texto do período.
+         * Ex: "1930-1945 (Era Vargas)" -> "1930 --------> 1945 (Era Vargas)"
+         * @param {string} periodoText - O texto do período de governo.
+         * @returns {string} - O HTML formatado como linha do tempo.
+         */
+        function generateTimelineHtml(periodoText) {
+            // Expressão regular para capturar os anos e a descrição opcional
+            const match = periodoText.match(/^(\d{4})(?:-(\d{4}|presente))?\s*(\(.*\))?$/);
+            
+            let startYear = '';
+            let endYear = '';
+            let description = '';
+
+            if (match) {
+                startYear = match[1];
+                endYear = match[2] || ''; // Pode ser undefined se não houver segundo ano
+                description = match[3] || ''; // Pode ser undefined se não houver descrição
+            } else {
+                // Fallback caso o formato não seja o esperado
+                return `<p>${periodoText}</p>`;
+            }
+
+            // Ajusta o texto do ano final se for "presente"
+            const displayEndYear = (endYear === 'presente' || endYear === '') ? 'Atualmente' : endYear;
+
+            // Constrói o HTML da linha do tempo
+            let timelineHtml = `
+                <div class="timeline-container">
+                    <span class="timeline-year">${startYear}</span>
+                    <div class="timeline-line"></div>
+                    <span class="timeline-year">${displayEndYear}</span>
+                </div>
+            `;
+            if (description) {
+                timelineHtml += `<p class="timeline-description">${description}</p>`;
+            }
+            return timelineHtml;
+        }
+
+        /**
+         * Verifica o chute do usuário contra o nome do presidente atual,
+         * considerando erros de digitação e nomes parciais.
+         */
+        function checkGuess() {
+            const guess = guessInputEl.value.trim(); // Obtém o chute e remove espaços em branco
+            if (guess === '') {
+                feedbackEl.textContent = 'Por favor, digite um nome antes de adivinhar.';
+                feedbackEl.className = 'text-center font-bold text-lg mb-6 text-orange-600';
+                return;
+            }
+
+            // Normaliza o nome do presidente (remove acentos, caixa alta/baixa)
+            const normalizedPresidentName = currentPresident.name
+                .normalize("NFD") // Normaliza para decompor caracteres acentuados
+                .replace(/[\u0300-\u036f]/g, "") // Remove diacríticos (acentos)
+                .toLowerCase(); // Converte para minúsculas
+            
+            // Normaliza o chute do usuário da mesma forma
+            const normalizedGuess = guess
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase();
+
+            let isCorrect = false;
+
+            // 1. Tenta uma comparação flexível com o nome completo
+            if (isCloseEnough(normalizedGuess, normalizedPresidentName)) {
+                isCorrect = true;
+            } else {
+                // 2. Se não houver correspondência direta, verifica partes do nome
+                // Divide o nome do presidente em palavras
+                const presidentNameParts = normalizedPresidentName.split(' ');
+
+                // Verifica se o chute é similar a alguma parte do nome (primeiro, último nome, etc.)
+                for (const part of presidentNameParts) {
+                    if (isCloseEnough(normalizedGuess, part)) {
+                        isCorrect = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isCorrect) {
+                // Exibe o nome do presidente e a frase de legado
+                feedbackEl.innerHTML = `
+                    Correto! O presidente era <span class="text-blue-700">${currentPresident.name}</span>.<br>
+                    <span class="text-gray-600 italic text-base">${currentPresident.legacySummary}</span>
+                `;
+                feedbackEl.className = 'text-center font-bold text-lg mb-6 text-green-600';
+                
+                // Exibe a imagem do presidente
+                if (currentPresident.imageUrl) {
+                    presidentImageEl.src = currentPresident.imageUrl;
+                    presidentImageEl.classList.remove('hidden');
+                }
+
+                // Desabilita apenas a entrada e o botão de adivinhar
+                guessInputEl.disabled = true;
+                submitGuessBtn.disabled = true;
+                // Os botões de dica permanecem habilitados
+                
+                newGameButton.style.display = 'block'; // Mostra o botão para iniciar um novo jogo
+            } else {
+                feedbackEl.textContent = 'Errado. Tente novamente ou peça uma dica!';
+                feedbackEl.className = 'text-center font-bold text-lg mb-6 text-red-600';
+            }
+        }
+
+        /**
+         * Exibe a dica solicitada pelo usuário.
+         * @param {string} hintType - O tipo de dica a ser exibida (periodo, curiosidades, projeto, sofremos).
+         */
+        function showHint(hintType) {
+            let hintContent = '';
+            switch (hintType) {
+                case 'periodo':
+                    // Usa a nova função para gerar a linha do tempo
+                    hintContent = generateTimelineHtml(currentPresident.periodo);
+                    break;
+                case 'curiosidades':
+                    hintContent = `Curiosidades: ${currentPresident.curiosidades}`;
+                    break;
+                case 'projeto':
+                    hintContent = `Principal Projeto de Governo: ${currentPresident.projeto}`;
+                    break;
+                case 'sofremos':
+                    hintContent = `Sofremos Até Hoje: ${currentPresident.sofremos}`;
+                    break;
+            }
+            // Define o innerHTML para permitir a renderização da linha do tempo
+            currentHintDisplayEl.innerHTML = hintContent;
+        }
+
+        // Adiciona ouvintes de eventos
+        submitGuessBtn.addEventListener('click', checkGuess); // Botão "Adivinhar"
+
+        // Permite adivinhar pressionando Enter no campo de entrada
+        guessInputEl.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                checkGuess();
+            }
+        });
+
+        // Adiciona ouvintes de eventos para todos os botões de dica
+        hintButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                showHint(button.dataset.hintType); // Usa o atributo data-hint-type para saber qual dica mostrar
+            });
+        });
+
+        newGameButton.addEventListener('click', startGame); // Botão "Próximo Presidente"
+
+        // Inicia o jogo quando a página é carregada
+        window.onload = startGame;
+    </script>
+</body>
+</html>
