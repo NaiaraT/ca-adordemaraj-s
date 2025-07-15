@@ -3,25 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qual é o Presidente do Brasil?</title>
-    <!-- Inclui Tailwind CSS para estilização responsiva -->
+    <title>Quiz: História do Brasil</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Define a fonte Inter para todo o corpo do documento */
         body {
             font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-        /* Estilos adicionais para centralizar e dar um visual agradável */
-        .container-game {
-            min-height: 100vh;
+            background-color: #f0f4f8; /* Light blue-gray background */
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #f3f4f6; /* Cor de fundo suave */
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
-        /* Estilo para a linha do tempo */
+        .container {
+            background-color: #ffffff; /* White background for the quiz box */
+            border-radius: 16px; /* More rounded corners */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        h1 {
+            color: #2c3e50; /* Darker text for heading */
+            font-size: 2.25rem; /* Larger heading */
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .quiz-section { /* General style for quiz sections */
+            margin-bottom: 25px;
+        }
+        .question-text {
+            font-size: 1.5rem; /* Larger question text */
+            color: #34495e; /* Medium dark text */
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        .options-container {
+            display: grid;
+            gap: 15px; /* Space between buttons */
+            margin-top: 20px;
+        }
+        .option-button {
+            background-color: #e0f2f7; /* Light blue for options */
+            color: #2c3e50;
+            border: 2px solid #a7d9ed; /* Border for buttons */
+            padding: 15px 25px;
+            border-radius: 10px; /* Rounded buttons */
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease; /* Smooth transition for hover/active */
+            outline: none;
+            text-align: left;
+        }
+        .option-button:hover {
+            background-color: #c0e6f2; /* Slightly darker blue on hover */
+            border-color: #7abed8;
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+        .option-button.correct {
+            background-color: #d4edda; /* Light green for correct */
+            border-color: #28a745;
+            color: #1a5e20;
+        }
+        .option-button.incorrect {
+            background-color: #f8d7da; /* Light red for incorrect */
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .feedback-text {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+        .feedback-text.correct {
+            color: #28a745; /* Green for correct feedback */
+        }
+        .feedback-text.incorrect {
+            color: #dc3545; /* Red for incorrect feedback */
+        }
+        .explanation-text {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: #555;
+            text-align: justify;
+            line-height: 1.5;
+        }
+        .action-button { /* General style for action buttons */
+            background-color: #007bff; /* Blue for next button */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            align-self: center; /* Center the button */
+        }
+        .action-button:hover {
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+        .action-button.secondary { /* Style for restart/back to menu buttons */
+            background-color: #6c757d; /* Gray */
+        }
+        .action-button.secondary:hover {
+            background-color: #5a6268;
+        }
+        .score-container {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #34495e;
+            margin-top: 20px;
+        }
+
+        /* Styles for Presidents Game */
+        .presidents-game-area {
+            width: 100%;
+        }
+        .presidents-initial-hint {
+            font-size: 1.2rem;
+            color: #34495e;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        .president-image {
+            width: 128px;
+            height: 128px;
+            object-fit: cover;
+            border-radius: 50%;
+            margin: 0 auto 24px auto;
+            border: 4px solid #90cdf4; /* Light blue border */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .guess-input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 16px;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #2d3748;
+            outline: none;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .guess-input:focus {
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+        }
+        .presidents-submit-button {
+            background-color: #4299e1; /* Blue */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-bottom: 16px;
+            width: 100%;
+        }
+        .presidents-submit-button:hover {
+            background-color: #3182ce; /* Darker blue */
+            transform: translateY(-2px);
+        }
+        .presidents-feedback {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .presidents-feedback.correct {
+            color: #38a169; /* Green */
+        }
+        .presidents-feedback.incorrect {
+            color: #e53e3e; /* Red */
+        }
+        .hints-area {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        @media (min-width: 640px) {
+            .hints-area {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .hint-button {
+            background-color: #a0aec0; /* Gray */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+        .hint-button:hover {
+            background-color: #718096; /* Darker gray */
+            transform: translateY(-2px);
+        }
+        .current-hint-display {
+            background-color: #edf2f7; /* Light gray */
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            color: #4a5568;
+            font-size: 0.95rem;
+            text-align: left;
+        }
+        .presidents-new-game-button {
+            background-color: #38a169; /* Green */
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            margin-top: 24px;
+            width: 100%;
+        }
+        .presidents-new-game-button:hover {
+            background-color: #2f855a; /* Darker green */
+            transform: translateY(-2px);
+        }
+
+        /* Timeline specific styles */
         .timeline-container {
             display: flex;
             align-items: center;
@@ -32,12 +247,12 @@
         .timeline-year {
             font-weight: bold;
             color: #333;
-            white-space: nowrap; /* Garante que o ano não quebre */
+            white-space: nowrap; /* Ensures the year doesn't break */
         }
         .timeline-line {
             flex-grow: 1;
             height: 2px;
-            background-color: #60a5fa; /* Cor azul suave */
+            background-color: #60a5fa; /* Soft blue color */
             margin: 0 10px;
         }
         .timeline-description {
@@ -46,56 +261,230 @@
             margin-top: 5px;
             text-align: center;
         }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+            .question-text {
+                font-size: 1.2rem;
+            }
+            .option-button, .action-button, .presidents-submit-button, .hint-button, .presidents-new-game-button {
+                font-size: 1rem;
+                padding: 12px 20px;
+            }
+            .feedback-text, .score-container, .explanation-text, .presidents-feedback, .current-hint-display, .presidents-initial-hint {
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
-<body class="container-game">
-    <div class="bg-white p-6 sm:p-8 md:p-10 rounded-xl shadow-lg w-11/12 max-w-lg mx-auto flex flex-col items-center">
-        <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-6 text-center">Qual é o Presidente?</h1>
-        <div id="game-area" class="w-full">
-            <p id="initial-hint" class="text-lg text-gray-700 italic mb-6 text-center"></p>
-
-            <!-- Imagem do presidente, inicialmente oculta -->
-            <!-- O atributo onerror foi removido para evitar o erro persistente com data:image/svg+xml -->
-            <img id="president-image" src="" alt="Imagem do Presidente" 
-                 class="hidden w-32 h-32 object-cover rounded-full mx-auto mb-6 border-4 border-blue-300 shadow-md">
-
-            <input type="text" id="guess-input" placeholder="Digite o nome do presidente"
-                   class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-800">
-            
-            <button id="submit-guess"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mb-4">
-                Adivinhar
-            </button>
-            
-            <p id="feedback" class="text-center font-bold text-lg mb-6"></p>
-
-            <div class="hints-area grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="periodo">
-                    Período de Governo
-                </button>
-                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="curiosidades">
-                    Curiosidades
-                </button>
-                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="projeto">
-                    Principal Projeto de Governo
-                </button>
-                <button class="hint-button bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105" data-hint-type="sofremos">
-                    Sofremos Até Hoje
-                </button>
-            </div>
-            <p id="current-hint-display" class="bg-gray-100 p-4 rounded-lg border border-gray-200 text-gray-700 text-base"></p>
+<body>
+    <div class="container">
+        <div id="main-menu" class="flex flex-col items-center gap-6">
+            <h1>Escolha um Quiz!</h1>
+            <button id="start-revolts-quiz" class="action-button">Jogar Quiz: Revoltas e Revoluções</button>
+            <button id="start-presidents-quiz" class="action-button">Jogar Quiz: Presidentes do Brasil</button>
         </div>
-        <button id="new-game-button"
-                class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mt-6"
-                style="display: none;">
-            Próximo Presidente
-        </button>
+
+        <div id="revolts-quiz-section" class="hidden quiz-section">
+            <h1>Quiz: Revoltas e Revoluções no Brasil</h1>
+            <div class="question-container" id="revolts-question-container">
+                <p class="question-text" id="revolts-question-text"></p>
+                <div class="options-container" id="revolts-options-container">
+                    <!-- Options will be loaded here by JavaScript -->
+                </div>
+                <p class="feedback-text" id="revolts-feedback-text"></p>
+                <p class="explanation-text" id="revolts-explanation-text"></p>
+            </div>
+            <button class="action-button hidden" id="revolts-next-button">Próxima Pergunta</button>
+            <div class="score-container hidden" id="revolts-score-container">
+                Sua Pontuação: <span id="revolts-final-score">0</span> de <span id="revolts-total-questions">0</span>
+            </div>
+            <button class="action-button secondary hidden" id="restart-revolts-button">Jogar Novamente</button>
+            <button class="action-button secondary hidden" id="back-to-menu-revolts-quiz">Voltar ao Menu</button>
+        </div>
+
+        <div id="presidents-quiz-section" class="hidden quiz-section">
+            <h1>Qual é o Presidente?</h1>
+            <div id="presidents-game-area" class="presidents-game-area">
+                <p id="presidents-initial-hint" class="presidents-initial-hint"></p>
+                <img id="president-image" src="" alt="Imagem do Presidente" class="hidden president-image">
+                <input type="text" id="presidents-guess-input" placeholder="Digite o nome do presidente"
+                       class="guess-input">
+                <button id="presidents-submit-guess" class="presidents-submit-button">
+                    Adivinhar
+                </button>
+                <p id="presidents-feedback" class="presidents-feedback"></p>
+                <div class="hints-area grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <button class="hint-button" data-hint-type="periodo" id="presidents-hint-periodo">
+                        Período de Governo
+                    </button>
+                    <button class="hint-button" data-hint-type="curiosidades" id="presidents-hint-curiosidades">
+                        Curiosidades
+                    </button>
+                    <button class="hint-button" data-hint-type="projeto" id="presidents-hint-projeto">
+                        Principal Projeto de Governo
+                    </button>
+                    <button class="hint-button" data-hint-type="sofremos" id="presidents-hint-sofremos">
+                        Sofremos Até Hoje
+                    </button>
+                </div>
+                <p id="presidents-current-hint-display" class="current-hint-display"></p>
+            </div>
+            <button id="presidents-new-game-button" class="presidents-new-game-button hidden">
+                Próximo Presidente
+            </button>
+            <button class="action-button secondary" id="back-to-menu-presidents">Voltar ao Menu</button>
+        </div>
     </div>
 
     <script>
-        // Array de objetos contendo os dados de cada presidente
-        // Você pode adicionar mais presidentes aqui, seguindo o mesmo formato. Brasil escola: Deodoro, 
-        const presidents = [
+        // --- Data for Revolts Quiz ---
+        const revoltsQuestions = [
+            {
+                question: "Qual revolta colonial brasileira foi liderada por Tiradentes e tinha como objetivo a independência de Minas Gerais?",
+                options: ["Revolta de Beckman", "Guerra dos Emboabas", "Inconfidência Mineira", "Revolução Pernambucana"],
+                answer: "Inconfidência Mineira",
+                explanation: "A Inconfidência Mineira (1789) foi um movimento de caráter separatista que buscava a independência da capitania de Minas Gerais do domínio português, motivado pela cobrança excessiva de impostos, como a Derrama. Tiradentes foi um dos principais líderes."
+            },
+            {
+                question: "A Revolta de Beckman, ocorrida no Maranhão em 1684, foi motivada principalmente pela insatisfação com qual monopólio?",
+                options: ["Monopólio do sal", "Monopólio da Companhia Geral do Comércio do Maranhão", "Monopólio do açúcar", "Monopólio do tabaco"],
+                answer: "Monopólio da Companhia Geral do Comércio do Maranhão",
+                explanation: "A Revolta de Beckman foi um levante de colonos do Maranhão contra a Companhia Geral do Comércio do Estado do Maranhão, que detinha o monopólio do comércio e era acusada de vender produtos caros e de baixa qualidade, além de não fornecer escravos em número suficiente."
+            },
+            {
+                question: "Qual revolta popular na Bahia, no final do século XVIII, tinha forte caráter social e religioso, buscando o fim da escravidão e a igualdade?",
+                options: ["Revolta dos Alfaiates (Conjuração Baiana)", "Revolta dos Malês", "Cabanagem", "Balaiada"],
+                answer: "Revolta dos Alfaiates (Conjuração Baiana)",
+                explanation: "A Conjuração Baiana (1798), também conhecida como Revolta dos Alfaiates, foi um movimento de caráter popular que defendia a proclamação da República, a abolição da escravidão e a igualdade social, com forte influência dos ideais da Revolução Francesa."
+            },
+            {
+                question: "A Guerra dos Mascates (1710-1711) opôs quais duas cidades pernambucanas devido a questões econômicas e políticas?",
+                options: ["Olinda e Recife", "Salvador e Olinda", "Recife e João Pessoa", "Natal e Olinda"],
+                answer: "Olinda e Recife",
+                explanation: "A Guerra dos Mascates foi um conflito entre a aristocracia rural de Olinda e os comerciantes (mascates) de Recife. Olinda era a sede do poder político, mas Recife, com seu porto, prosperava economicamente, o que gerou tensões e disputas por autonomia."
+            },
+            {
+                question: "Qual revolta, ocorrida no Pará entre 1835 e 1840, foi uma das mais sangrentas do período regencial, envolvendo cabanos e populações ribeirinhas?",
+                options: ["Farroupilha", "Sabinada", "Cabanagem", "Praieira"],
+                answer: "Cabanagem",
+                explanation: "A Cabanagem foi uma revolta popular na província do Grão-Pará, durante o período regencial. Envolveu indígenas, negros, mestiços e brancos pobres (os 'cabanos') que lutavam contra a miséria e a elite local, chegando a tomar o poder na província."
+            },
+            {
+                question: "A Revolução Farroupilha (1835-1845) foi a mais longa revolta regencial e ocorreu em qual província?",
+                options: ["Bahia", "Pernambuco", "Rio Grande do Sul", "Maranhão"],
+                answer: "Rio Grande do Sul",
+                explanation: "A Revolução Farroupilha, ou Guerra dos Farrapos, foi um conflito separatista que durou dez anos no Rio Grande do Sul. Os farrapos protestavam contra os altos impostos sobre o charque gaúcho e a centralização do poder no Império."
+            },
+            {
+                question: "Qual revolta na Bahia (1837-1838) foi liderada por Sabino Barroso e tinha como objetivo a instauração de uma república baiana temporária?",
+                options: ["Revolta dos Malês", "Sabinada", "Conjuração Baiana", "Revolta dos Búzios"],
+                answer: "Sabinada",
+                explanation: "A Sabinada foi uma revolta de caráter republicano e separatista na Bahia, liderada por Francisco Sabino Álvares da Rocha Vieira. Os revoltosos proclamaram uma república temporária na província, que duraria apenas enquanto D. Pedro II não atingisse a maioridade."
+            },
+            {
+                question: "A Balaiada (1838-1841) foi uma revolta popular no Maranhão que contou com a participação de quais grupos sociais?",
+                options: ["Fazendeiros e comerciantes", "Militares e religiosos", "Vaqueiros, artesãos e escravos libertos", "Imigrantes europeus"],
+                answer: "Vaqueiros, artesãos e escravos libertos",
+                explanation: "A Balaiada foi uma revolta popular no Maranhão, com grande participação de vaqueiros, artesãos, lavradores e escravos. O nome vem de Manuel Francisco dos Anjos Ferreira, um baleiro (fabricante de balaios), um dos líderes do movimento."
+            },
+            {
+                question: "Qual revolta de escravos, de maioria muçulmana, ocorreu em Salvador, Bahia, em 1835?",
+                options: ["Revolta dos Alfaiates", "Revolta dos Malês", "Conjuração Carioca", "Revolta da Chibata"],
+                answer: "Revolta dos Malês",
+                explanation: "A Revolta dos Malês foi um levante de escravos muçulmanos em Salvador, Bahia. Os malês eram escravos alfabetizados em árabe e de religião islâmica, que planejavam uma insurreição para libertar os escravos e estabelecer um governo islâmico."
+            },
+            {
+                question: "A Revolução Praieira (1848-1850), em Pernambuco, defendia ideias liberais radicais e o fim do monopólio comercial. Qual era o nome do jornal que a inspirou?",
+                options: ["O Popular", "Diário de Pernambuco", "A Voz do Povo", "Diário Novo"],
+                answer: "Diário Novo",
+                explanation: "A Revolução Praieira foi um movimento liberal e federalista em Pernambuco, que defendia reformas sociais e políticas, como o voto livre e universal, a liberdade de imprensa e o fim do monopólio comercial português. O jornal 'Diário Novo' era o porta-voz do movimento."
+            },
+            {
+                question: "Qual revolta no Rio de Janeiro, em 1904, foi uma reação popular à campanha de vacinação obrigatória contra a varíola?",
+                options: ["Revolta da Chibata", "Revolta da Vacina", "Revolta dos Tenentes", "Guerra de Canudos"],
+                answer: "Revolta da Vacina",
+                explanation: "A Revolta da Vacina foi um levante popular no Rio de Janeiro contra a vacinação obrigatória contra a varíola, imposta pelo governo de Rodrigues Alves e liderada por Oswaldo Cruz. A população resistiu devido à falta de informação, invasão de casas e desconfiança."
+            },
+            {
+                question: "A Guerra de Canudos (1896-1897) foi um conflito no sertão da Bahia envolvendo o exército e seguidores de qual líder religioso?",
+                options: ["Padre Cícero", "Antônio Conselheiro", "Beato José", "Frei Caneca"],
+                answer: "Antônio Conselheiro",
+                explanation: "A Guerra de Canudos foi um conflito no sertão baiano entre o Exército Brasileiro e os sertanejos liderados por Antônio Conselheiro, que fundou o arraial de Canudos. O movimento era de caráter messiânico e contestava a República e a ordem social vigente."
+            },
+            {
+                question: "Qual movimento messiânico e de contestação social ocorreu no sul do Brasil (Paraná e Santa Catarina) entre 1912 e 1916?",
+                options: ["Guerra do Contestado", "Revolta da Armada", "Revolução Federalista", "Coluna Prestes"],
+                answer: "Guerra do Contestado",
+                explanation: "A Guerra do Contestado foi um conflito armado na região fronteiriça entre Paraná e Santa Catarina, disputada por fazendeiros, posseiros e companhias estrangeiras. O movimento teve forte caráter messiânico, liderado por monges como José Maria."
+            },
+            {
+                question: "A Revolta da Chibata (1910) foi um motim de marinheiros no Rio de Janeiro que protestavam contra o que?",
+                options: ["Baixos salários", "Falta de comida", "Os castigos físicos (chibatadas)", "Aumento de impostos"],
+                answer: "Os castigos físicos (chibatadas)",
+                explanation: "A Revolta da Chibata foi um motim de marinheiros da Marinha do Brasil no Rio de Janeiro, liderados por João Cândido. Eles protestavam contra os castigos físicos (chibatadas) e as péssimas condições de trabalho e alimentação a bordo dos navios."
+            },
+            {
+                question: "Qual movimento de jovens oficiais do exército, na década de 1920, criticava a República Oligárquica e exigia reformas políticas?",
+                options: ["Revolução de 1930", "Revolta da Armada", "Tenentismo", "Revolução Constitucionalista"],
+                answer: "Tenentismo",
+                explanation: "O Tenentismo foi um movimento político-militar de jovens oficiais do Exército Brasileiro na década de 1920. Eles criticavam a corrupção da República Oligárquica, a fraude eleitoral e defendiam reformas políticas e sociais, como o voto secreto e a moralização da política."
+            },
+            {
+                question: "A Revolução de 1930 marcou o fim da República Velha e a ascensão de qual figura política ao poder?",
+                options: ["Washington Luís", "Júlio Prestes", "Getúlio Vargas", "Artur Bernardes"],
+                answer: "Getúlio Vargas",
+                explanation: "A Revolução de 1930 foi um movimento armado que derrubou a República Velha e impediu a posse de Júlio Prestes, levando Getúlio Vargas ao poder. Marcou o início da Era Vargas e profundas transformações políticas e sociais no Brasil."
+            },
+            {
+                question: "Qual revolução, ocorrida em São Paulo em 1932, exigia uma nova Constituição para o Brasil?",
+                options: ["Revolução de 1930", "Revolução Constitucionalista", "Intentona Comunista", "Revolta Paulista"],
+                answer: "Revolução Constitucionalista",
+                explanation: "A Revolução Constitucionalista de 1932 foi um movimento armado em São Paulo contra o governo provisório de Getúlio Vargas. Os paulistas exigiam a promulgação de uma nova Constituição para o país e a reconstitucionalização do Brasil."
+            },
+            {
+                question: "A Intentona Comunista (1935) foi uma tentativa de golpe para derrubar o governo Vargas, liderada por qual partido?",
+                options: ["Partido Liberal", "Partido Comunista do Brasil (PCB)", "Aliança Integralista Brasileira", "Partido Social Democrático"],
+                answer: "Partido Comunista do Brasil (PCB)",
+                explanation: "A Intentona Comunista foi uma tentativa de golpe de Estado liderada pela Aliança Nacional Libertadora (ANL), com forte influência do Partido Comunista do Brasil (PCB). O objetivo era derrubar o governo Vargas e implantar um regime socialista no país."
+            },
+            {
+                question: "Qual revolta, em 1938, foi uma tentativa de golpe integralista contra o governo Vargas, que ficou conhecida como 'Putsch Integralista'?",
+                options: ["Revolta do Forte de Copacabana", "Levante Comunista", "Golpe do Estado Novo", "Intentona Integralista"],
+                answer: "Intentona Integralista",
+                explanation: "A Intentona Integralista foi uma tentativa de golpe de Estado em 1938, liderada pela Ação Integralista Brasileira (AIB), um movimento de inspiração fascista. Os integralistas tentaram invadir o Palácio Guanabara para depor Getúlio Vargas, mas foram contidos."
+            },
+            {
+                question: "O Golpe Militar de 1964 derrubou qual presidente e iniciou um período de ditadura no Brasil?",
+                options: ["João Goulart", "Juscelino Kubitschek", "Jânio Quadros", "Eurico Gaspar Dutra"],
+                answer: "João Goulart",
+                explanation: "O Golpe Militar de 1964 foi um movimento político-militar que depôs o presidente João Goulart e instaurou uma ditadura militar no Brasil, que durou até 1985. O golpe foi justificado pela necessidade de combater a 'ameaça comunista' e a 'corrupção'."
+            }
+        ];
+
+        let revoltsCurrentQuestionIndex = 0;
+        let revoltsScore = 0;
+        let revoltsAnswered = false;
+
+        // Get elements for the revolts quiz
+        const revoltsQuizSection = document.getElementById('revolts-quiz-section');
+        const revoltsQuestionTextElement = document.getElementById('revolts-question-text');
+        const revoltsOptionsContainer = document.getElementById('revolts-options-container');
+        const revoltsFeedbackTextElement = document.getElementById('revolts-feedback-text');
+        const revoltsExplanationTextElement = document.getElementById('revolts-explanation-text');
+        const revoltsNextButton = document.getElementById('revolts-next-button');
+        const revoltsScoreContainer = document.getElementById('revolts-score-container');
+        const revoltsFinalScoreElement = document.getElementById('revolts-final-score');
+        const revoltsTotalQuestionsElement = document.getElementById('revolts-total-questions');
+        const restartRevoltsButton = document.getElementById('restart-revolts-button');
+        const backToMenuRevoltsQuizButton = document.getElementById('back-to-menu-revolts-quiz'); // Renamed ID for clarity
+        const revoltsQuestionContainer = document.getElementById('revolts-question-container');
+
+        // --- Data for Presidents Quiz ---
+        const presidentsData = [
             {
                 name: "Marechal Deodoro da Fonseca",
                 initialHint: "República no Brasil é uma coisa impossível porque será uma verdadeira desgraça.",
@@ -104,7 +493,7 @@
                 projeto: "Proclamação da República e consolidação do regime republicano.",
                 sofremos: "A instabilidade política e a falta de participação popular nos primeiros anos da República, que se arrastaram por décadas, marcando um governo fortemente autoritário.",
                 legacySummary: "O proclamador da República, que enfrentou a consolidação do novo regime com desafios e renúncias.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Deodoro" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Deodoro"
             },
             {
                 name: "Floriano Peixoto",
@@ -114,7 +503,7 @@
                 projeto: "Consolidação da República e defesa do regime contra movimentos monarquistas e federalistas.",
                 sofremos: "A centralização do poder e a repressão a opositores, que em certos momentos suprimiu liberdades.",
                 legacySummary: "O 'Marechal de Ferro' que consolidou a República, mas com forte centralização e repressão.Seu governo marcou o fim da República da Espada",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Floriano" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Floriano"
             },
             {
                 name: "Campos Sales",
@@ -124,7 +513,7 @@
                 projeto: "Ajuste financeiro e estabilização da economia através de empréstimos e renegociação de dívidas externas.",
                 sofremos: "Aprofundamento da dependência econômica e política dos estados, resultando em oligarquias regionais e exclusão social.",
                 legacySummary: "O arquiteto da 'Política dos Governadores' e da estabilização financeira, que consolidou o poder das oligarquias.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Campos+Sales" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Campos+Sales"
             },
             {
                 name: "Rodrigues Alves",
@@ -134,7 +523,7 @@
                 projeto: "Reforma urbana e sanitária do Rio de Janeiro (Bota-Abaixo), combate a doenças como febre amarela e varíola.",
                 sofremos: "A violência e a repressão na implementação da vacinação obrigatória, gerando a Revolta da Vacina.",
                 legacySummary: "O presidente da modernização sanitária e urbana do Rio de Janeiro, que enfrentou a Revolta da Vacina.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Rodrigues+Alves" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Rodrigues+Alves"
             },
             {
                 name: "Afonso Pena",
@@ -144,7 +533,7 @@
                 projeto: "Incentivo à imigração e à colonização, expansão da malha ferroviária e criação da Caixa de Conversão.",
                 sofremos: "Ainda persistia a dependência da economia cafeeira e a exclusão social no campo.",
                 legacySummary: "O presidente que focou no desenvolvimento ferroviário e na imigração, buscando o povoamento do interior.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Afonso+Pena" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Afonso+Pena"
             },
             {
                 name: "Nilo Peçanha",
@@ -154,7 +543,7 @@
                 projeto: "Criação do Ministério da Agricultura, Indústria e Comércio e das Escolas de Aprendizes Artífices (futuros IFs).",
                 sofremos: "A curta duração de seu mandato impediu a consolidação de muitas de suas propostas sociais e educacionais.",
                 legacySummary: "O presidente que impulsionou a educação técnica e a agricultura, buscando a modernização do país.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Nilo+Pecanha" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Nilo+Pecanha"
             },
             {
                 name: "Hermes da Fonseca",
@@ -164,7 +553,7 @@
                 projeto: "Reforma militar, criação da Escola Militar do Realengo, e intervenção em estados para moralizar a política.",
                 sofremos: "A 'Política das Salvações' gerou conflitos e instabilidade em diversos estados, com forte repressão.",
                 legacySummary: "O marechal que tentou moralizar a política através de intervenções, gerando conflitos e resistência.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Hermes+Fonseca" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Hermes+Fonseca"
             },
             {
                 name: "Venceslau Brás",
@@ -174,7 +563,7 @@
                 projeto: "Estabilização econômica, criação do Banco do Brasil e investimentos em infraestrutura, apesar da guerra.",
                 sofremos: "A gripe espanhola, que devastou o país no final de seu mandato, revelando a fragilidade da saúde pública.",
                 legacySummary: "O presidente que conduziu o Brasil durante a Primeira Guerra Mundial, buscando a neutralidade e a estabilidade.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Venceslau+Bras" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Venceslau+Bras"
             },
             {
                 name: "Delfim Moreira",
@@ -184,7 +573,7 @@
                 projeto: "Governo de transição, sem grandes projetos devido à sua saúde e ao curto período.",
                 sofremos: "A instabilidade política gerada pela sua condição de saúde e a transição conturbada de poder.",
                 legacySummary: "O presidente interino que enfrentou um período de transição política e de saúde frágil.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Delfim+Moreira" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Delfim+Moreira"
             },
             {
                 name: "Epitácio Pessoa",
@@ -194,7 +583,7 @@
                 projeto: "Investimentos em infraestrutura no Nordeste, saneamento básico e modernização do exército.",
                 sofremos: "A crise econômica pós-guerra e a eclosão do movimento tenentista, que questionava a República Velha.",
                 legacySummary: "O presidente que buscou modernizar o Nordeste e o exército, mas enfrentou a crise pós-guerra e o tenentismo.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Epitacio+Pessoa" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Epitacio+Pessoa"
             },
             {
                 name: "Artur Bernardes",
@@ -204,7 +593,7 @@
                 projeto: "Combate ao tenentismo e estabilização política, buscando a ordem e o controle do governo.",
                 sofremos: "A forte repressão política e a perseguição a opositores, que marcaram seu governo autoritário.",
                 legacySummary: "O presidente que governou sob estado de sítio, marcado pela repressão e pelo combate aos movimentos militares.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Artur+Bernardes" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Artur+Bernardes"
             },
             {
                 name: "Washington Luís",
@@ -214,7 +603,7 @@
                 projeto: "Vasta construção de rodovias (política rodoviária), visando a integração nacional e o escoamento da produção.",
                 sofremos: "A crise econômica de 1929 e a quebra da política do café com leite, que levaram à Revolução de 1930.",
                 legacySummary: "O presidente das estradas, que buscou a modernização do transporte, mas foi deposto pela Revolução de 1930.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Washington+Luis" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Washington+Luis"
             },
             {
                 name: "Getúlio Vargas",
@@ -224,7 +613,7 @@
                 projeto: "Criação da CLT (Consolidação das Leis do Trabalho), criação de empresas estatais como a Petrobras e Vale.",
                 sofremos: "O autoritarismo do Estado Novo, a censura e a perseguição política, que suprimiram a democracia por anos.",
                 legacySummary: "O líder da Era Vargas, que modernizou o Brasil, criou leis trabalhistas, mas também impôs um regime autoritário.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Getulio+Vargas" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Getulio+Vargas"
             },
             {
                 name: "José Linhares",
@@ -234,7 +623,7 @@
                 projeto: "Governo de transição para a redemocratização, convocando eleições e garantindo a ordem.",
                 sofremos: "A curta duração e o caráter provisório de seu governo limitaram sua capacidade de grandes transformações.",
                 legacySummary: "O presidente interino que conduziu o Brasil na transição da Era Vargas para a redemocratização.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Jose+Linhares" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Jose+Linhares"
             },
             {
                 name: "Eurico Gaspar Dutra",
@@ -244,7 +633,7 @@
                 projeto: "Plano SALTE (Saúde, Alimentação, Transporte e Energia), buscando o desenvolvimento econômico e social.",
                 sofremos: "A abertura econômica excessiva que prejudicou a indústria nacional e a perseguição ao Partido Comunista.",
                 legacySummary: "O presidente da redemocratização, que buscou o desenvolvimento através do Plano SALTE, mas enfrentou desafios econômicos.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Eurico+Dutra" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Eurico+Dutra"
             },
             {
                 name: "Café Filho",
@@ -254,7 +643,7 @@
                 projeto: "Governo de transição em um período de grande instabilidade política após a morte de Vargas.",
                 sofremos: "A instabilidade política e as crises sucessórias que marcaram o período pós-Vargas.",
                 legacySummary: "O presidente interino que assumiu em um momento de crise, buscando a legalidade em meio à instabilidade.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Cafe+Filho" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Cafe+Filho"
             },
             {
                 name: "Carlos Luz",
@@ -264,7 +653,7 @@
                 projeto: "Governo de curtíssima duração, marcado pela tentativa de impedir a posse de Juscelino Kubitschek.",
                 sofremos: "A instabilidade política e as manobras para impedir a posse de presidentes eleitos, fragilizando a democracia.",
                 legacySummary: "O presidente interino que teve um breve e conturbado mandato, marcado por tentativas de golpe.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Carlos+Luz" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Carlos+Luz"
             },
             {
                 name: "Nereu Ramos",
@@ -274,7 +663,7 @@
                 projeto: "Governo de transição que assegurou a posse de Juscelino Kubitschek, fundamental para a estabilidade democrática.",
                 sofremos: "Ainda que tenha garantido a posse, a fragilidade institucional da época abria precedentes para futuras crises.",
                 legacySummary: "O presidente interino que foi crucial para garantir a posse de JK, estabilizando o cenário político.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Nereu+Ramos" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Nereu+Ramos"
             },
             {
                 name: "Juscelino Kubitschek",
@@ -284,7 +673,7 @@
                 projeto: "Construção de Brasília, Plano de Metas para o desenvolvimento industrial e rodoviário.",
                 sofremos: "A inflação e o endividamento externo para financiar as grandes obras, deixando um legado de problemas econômicos.",
                 legacySummary: "O presidente da Bossa Nova e da construção de Brasília, que impulsionou o desenvolvimento, mas com alto custo econômico.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Juscelino+Kubitschek" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Juscelino+Kubitschek"
             },
             {
                 name: "Jânio Quadros",
@@ -294,7 +683,7 @@
                 projeto: "Medidas moralizadoras e combate à corrupção, mas com estilo personalista e polêmico.",
                 sofremos: "A renúncia inesperada gerou uma crise política e institucional que culminou no golpe de 1964.",
                 legacySummary: "O presidente da vassoura, que renunciou ao cargo, mergulhando o país em profunda crise política.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Janio+Quadros" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Janio+Quadros"
             },
             {
                 name: "Ranieri Mazzilli",
@@ -304,7 +693,7 @@
                 projeto: "Governos de transição em momentos de grande instabilidade, sem grandes projetos próprios.",
                 sofremos: "A fragilidade política que exigia a atuação de presidentes interinos em momentos críticos da história.",
                 legacySummary: "O presidente interino em duas ocasiões de crise, representando a fragilidade institucional da época.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Ranieri+Mazzilli" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Ranieri+Mazzilli"
             },
             {
                 name: "João Goulart",
@@ -314,7 +703,7 @@
                 projeto: "Tentativa de implementar as Reformas de Base (agrária, urbana, bancária, eleitoral), visando maior justiça social.",
                 sofremos: "A polarização política e a instabilidade que levaram ao golpe militar de 1964, instaurando um longo período de ditadura.",
                 legacySummary: "O presidente deposto pelo golpe de 64, que buscava reformas sociais, mas enfrentou forte oposição e instabilidade.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Joao+Goulart" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Joao+Goulart"
             },
             {
                 name: "Humberto Castelo Branco",
@@ -324,7 +713,7 @@
                 projeto: "Reorganização econômica (PAEG), combate à inflação e criação de instituições do regime militar.",
                 sofremos: "O início da repressão política, a cassação de direitos e a supressão da democracia.",
                 legacySummary: "O primeiro presidente da ditadura militar, que iniciou a repressão e a reorganização do Estado.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Castelo+Branco" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Castelo+Branco"
             },
             {
                 name: "Artur da Costa e Silva",
@@ -334,7 +723,7 @@
                 projeto: "Obras de infraestrutura (Ponte Rio-Niterói), mas com forte repressão política e censura.",
                 sofremos: "O período mais duro da ditadura militar, com o AI-5, tortura e perseguição a opositores.",
                 legacySummary: "O presidente que endureceu a ditadura militar, marcando o período mais repressivo do regime.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Costa+e+Silva" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Costa+e+Silva"
             },
             {
                 name: "Emílio Médici",
@@ -344,7 +733,7 @@
                 projeto: "Grandes obras (Transamazônica), Copa do Mundo de 1970, e forte crescimento econômico.",
                 sofremos: "A intensificação da repressão política e da tortura, em paralelo com o 'milagre' econômico.",
                 legacySummary: "O presidente do 'Milagre Econômico' e da repressão mais intensa da ditadura militar.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Emilio+Medici" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Emilio+Medici"
             },
             {
                 name: "Ernesto Geisel",
@@ -354,7 +743,7 @@
                 projeto: "Início da distensão e abertura política, buscando a transição para a democracia.",
                 sofremos: "A lentidão e as contradições do processo de abertura, que ainda permitiam abusos e resistências à democracia.",
                 legacySummary: "O presidente que iniciou a abertura política, buscando uma transição gradual para a democracia.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Ernesto+Geisel" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Ernesto+Geisel"
             },
             {
                 name: "João Figueiredo",
@@ -364,7 +753,7 @@
                 projeto: "Consolidação da abertura política, Lei da Anistia e transição para o governo civil.",
                 sofremos: "A crise econômica, a inflação e a dívida externa, que marcaram o fim da ditadura militar.",
                 legacySummary: "O último presidente militar, que concluiu a abertura política e a transição para a democracia.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Joao+Figueiredo" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Joao+Figueiredo"
             },
             {
                 name: "José Sarney",
@@ -374,7 +763,7 @@
                 projeto: "Promulgação da Constituição de 1988, Plano Cruzado (combate à inflação) e início da Nova República.",
                 sofremos: "A hiperinflação, os planos econômicos fracassados e a instabilidade política nos primeiros anos da Nova República.",
                 legacySummary: "O primeiro presidente civil pós-ditadura, que promulgou a Constituição de 88, mas enfrentou a hiperinflação.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Jose+Sarney" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Jose+Sarney"
             },
             {
                 name: "Fernando Collor de Mello",
@@ -384,7 +773,7 @@
                 projeto: "Plano Collor (combate à inflação), abertura econômica e privatizações.",
                 sofremos: "O confisco das poupanças, a hiperinflação e o processo de impeachment por corrupção.",
                 legacySummary: "O 'caçador de marajás' que confiscou poupanças e sofreu impeachment por corrupção.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Fernando+Collor" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Fernando+Collor"
             },
             {
                 name: "Itamar Franco",
@@ -394,7 +783,7 @@
                 projeto: "Criação do Plano Real (iniciado por FHC, seu Ministro da Fazenda), estabilizando a economia.",
                 sofremos: "A instabilidade política e a desconfiança inicial do mercado após o impeachment de Collor.",
                 legacySummary: "O presidente que conduziu a transição pós-impeachment e lançou as bases para o Plano Real.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Itamar+Franco" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Itamar+Franco"
             },
             {
                 name: "Fernando Henrique Cardoso",
@@ -404,7 +793,7 @@
                 projeto: "Plano Real (estabilização da moeda e controle da inflação), privatizações e reformas estruturais.",
                 sofremos: "As privatizações de empresas estatais, que geraram debates sobre a soberania nacional e o papel do Estado na economia.",
                 legacySummary: "O criador do Plano Real, que estabilizou a economia e promoveu privatizações, marcando uma nova era econômica.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=FHC" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=FHC"
             },
             {
                 name: "Luiz Inácio Lula da Silva",
@@ -414,7 +803,7 @@
                 projeto: "Criação do Bolsa Família, políticas de inclusão social, crescimento econômico e valorização do salário mínimo.",
                 sofremos: "Escândalos de corrupção que mancharam a imagem do governo e afetaram a confiança nas instituições.",
                 legacySummary: "O presidente que ampliou programas sociais e impulsionou o crescimento econômico, mas enfrentou acusações de corrupção.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Lula" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Lula"
             },
             {
                 name: "Dilma Rousseff",
@@ -424,7 +813,7 @@
                 projeto: "Programas sociais como 'Minha Casa, Minha Vida' e expansão do acesso à educação superior com o Pronatec.",
                 sofremos: "A instabilidade política e a crise econômica que culminaram no seu impeachment, deixando um legado de profunda polarização.",
                 legacySummary: "A primeira mulher presidente, que expandiu programas sociais, mas teve seu mandato interrompido por impeachment.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Dilma" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Dilma"
             },
             {
                 name: "Michel Temer",
@@ -434,7 +823,7 @@
                 projeto: "Reformas econômicas, como a Reforma Trabalhista e a PEC do Teto de Gastos.",
                 sofremos: "A impopularidade e as acusações de corrupção que marcaram seu governo pós-impeachment.",
                 legacySummary: "O presidente que assumiu após o impeachment de Dilma, implementando reformas econômicas impopulares.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Michel+Temer" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Michel+Temer"
             },
             {
                 name: "Jair Bolsonaro",
@@ -444,92 +833,168 @@
                 projeto: "Reformas da Previdência, agenda liberal na economia e pautas conservadoras.",
                 sofremos: "A polarização política, a gestão da pandemia de COVID-19 e as tensões com as instituições democráticas.",
                 legacySummary: "O presidente que marcou uma guinada à direita, enfrentando forte polarização e desafios na gestão da pandemia.",
-                imageUrl: "https://via.placeholder.com/128/ADD8E6/000000?text=Jair+Bolsonaro" // Exemplo de URL de imagem
+                imageUrl: "https://placehold.co/128x128/ADD8E6/000000?text=Jair+Bolsonaro"
             }
         ];
 
-        let currentPresidentIndex;
-        let currentPresident;
+        let presidentsCurrentPresidentIndex;
+        let presidentsCurrentPresident;
 
-        // Referências aos elementos DOM
-        const initialHintEl = document.getElementById('initial-hint');
-        const guessInputEl = document.getElementById('guess-input');
-        const submitGuessBtn = document.getElementById('submit-guess');
-        const feedbackEl = document.getElementById('feedback');
-        const hintButtons = document.querySelectorAll('.hint-button');
-        const currentHintDisplayEl = document.getElementById('current-hint-display');
-        const newGameButton = document.getElementById('new-game-button');
-        const presidentImageEl = document.getElementById('president-image'); // Referência ao elemento da imagem
+        // Get elements for the presidents quiz
+        const presidentsQuizSection = document.getElementById('presidents-quiz-section');
+        const presidentsInitialHintEl = document.getElementById('presidents-initial-hint');
+        const presidentsGuessInputEl = document.getElementById('presidents-guess-input');
+        const presidentsSubmitGuessBtn = document.getElementById('presidents-submit-guess');
+        const presidentsFeedbackEl = document.getElementById('presidents-feedback');
+        const presidentsHintButtons = presidentsQuizSection.querySelectorAll('.hint-button');
+        const presidentsCurrentHintDisplayEl = document.getElementById('presidents-current-hint-display');
+        const presidentsNewGameButton = document.getElementById('presidents-new-game-button');
+        const presidentImageEl = document.getElementById('president-image');
+        const backToMenuPresidentsButton = document.getElementById('back-to-menu-presidents');
 
-        /**
-         * Escolhe um presidente aleatório do array `presidents` para a rodada.
-         */
-        function chooseRandomPresident() {
-            currentPresidentIndex = Math.floor(Math.random() * presidents.length);
-            currentPresident = presidents[currentPresidentIndex];
+        // Get elements for the main menu
+        const mainMenu = document.getElementById('main-menu');
+        const startRevoltsQuizButton = document.getElementById('start-revolts-quiz');
+        const startPresidentsQuizButton = document.getElementById('start-presidents-quiz');
+
+        // --- General Utility Functions ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
         }
 
-        /**
-         * Inicia uma nova rodada do jogo, reiniciando os elementos da interface.
-         */
-        function startGame() {
-            chooseRandomPresident(); // Seleciona um novo presidente
-            initialHintEl.textContent = currentPresident.initialHint; // Exibe a dica inicial
-            guessInputEl.value = ''; // Limpa o campo de chute
-            feedbackEl.textContent = ''; // Limpa a mensagem de feedback
-            currentHintDisplayEl.textContent = ''; // Limpa a dica atual exibida
+        function showSection(sectionId) {
+            mainMenu.classList.add('hidden');
+            revoltsQuizSection.classList.add('hidden');
+            presidentsQuizSection.classList.add('hidden');
+            document.getElementById(sectionId).classList.remove('hidden');
+        }
+
+        // --- Revolts Quiz Functions ---
+        function loadRevoltsQuestion() {
+            revoltsAnswered = false;
+            revoltsFeedbackTextElement.textContent = '';
+            revoltsExplanationTextElement.textContent = '';
+            revoltsNextButton.classList.add('hidden');
+            revoltsOptionsContainer.innerHTML = '';
+
+            if (revoltsCurrentQuestionIndex < revoltsQuestions.length) {
+                const currentQuestion = revoltsQuestions[revoltsCurrentQuestionIndex];
+                revoltsQuestionTextElement.textContent = currentQuestion.question;
+
+                const shuffledOptions = [...currentQuestion.options];
+                shuffleArray(shuffledOptions);
+
+                shuffledOptions.forEach(option => {
+                    const button = document.createElement('button');
+                    button.textContent = option;
+                    button.classList.add('option-button');
+                    button.addEventListener('click', () => selectRevoltsAnswer(option, currentQuestion.answer, currentQuestion.explanation, button));
+                    revoltsOptionsContainer.appendChild(button);
+                });
+            } else {
+                showRevoltsResults();
+            }
+        }
+
+        function selectRevoltsAnswer(selectedOption, correctAnswer, explanation, clickedButton) {
+            if (revoltsAnswered) return;
+            revoltsAnswered = true;
+
+            Array.from(revoltsOptionsContainer.children).forEach(button => {
+                button.disabled = true;
+            });
+
+            if (selectedOption === correctAnswer) {
+                revoltsScore++;
+                clickedButton.classList.add('correct');
+                revoltsFeedbackTextElement.textContent = 'Correto!';
+                revoltsFeedbackTextElement.classList.remove('incorrect');
+                revoltsFeedbackTextElement.classList.add('correct');
+                revoltsExplanationTextElement.textContent = explanation;
+            } else {
+                clickedButton.classList.add('incorrect');
+                revoltsFeedbackTextElement.textContent = `Incorreto! A resposta correta era: ${correctAnswer}`;
+                revoltsFeedbackTextElement.classList.remove('correct');
+                revoltsFeedbackTextElement.classList.add('incorrect');
+                revoltsExplanationTextElement.textContent = '';
+
+                Array.from(revoltsOptionsContainer.children).forEach(button => {
+                    if (button.textContent === correctAnswer) {
+                        button.classList.add('correct');
+                    }
+                });
+            }
+            revoltsNextButton.classList.remove('hidden');
+        }
+
+        function showRevoltsResults() {
+            revoltsQuestionContainer.classList.add('hidden');
+            revoltsNextButton.classList.add('hidden');
+            revoltsScoreContainer.classList.remove('hidden');
+            restartRevoltsButton.classList.remove('hidden');
+            backToMenuRevoltsQuizButton.classList.remove('hidden'); // Show back to menu button for revolts quiz
+            revoltsFinalScoreElement.textContent = revoltsScore;
+            revoltsTotalQuestionsElement.textContent = revoltsQuestions.length;
+        }
+
+        function restartRevoltsQuiz() {
+            revoltsCurrentQuestionIndex = 0;
+            revoltsScore = 0;
+            shuffleArray(revoltsQuestions);
+            revoltsQuestionContainer.classList.remove('hidden');
+            revoltsScoreContainer.classList.add('hidden');
+            restartRevoltsButton.classList.add('hidden');
+            backToMenuRevoltsQuizButton.classList.add('hidden'); // Hide back to menu button on restart
+            loadRevoltsQuestion();
+        }
+
+        // --- Presidents Quiz Functions ---
+        function chooseRandomPresident() {
+            presidentsCurrentPresidentIndex = Math.floor(Math.random() * presidentsData.length);
+            presidentsCurrentPresident = presidentsData[presidentsCurrentPresidentIndex];
+        }
+
+        function startPresidentsGame() {
+            chooseRandomPresident();
+            presidentsInitialHintEl.textContent = presidentsCurrentPresident.initialHint;
+            presidentsGuessInputEl.value = '';
+            presidentsFeedbackEl.textContent = '';
+            presidentsCurrentHintDisplayEl.textContent = '';
             
-            // Esconde e limpa a imagem do presidente
             presidentImageEl.src = '';
             presidentImageEl.classList.add('hidden');
             
-            // Reabilita os elementos de entrada e botões de ação
-            guessInputEl.disabled = false;
-            submitGuessBtn.disabled = false;
-            hintButtons.forEach(button => button.disabled = false); // Garante que os botões de dica estejam sempre habilitados no início
-            newGameButton.style.display = 'none'; // Esconde o botão de 'Próximo Presidente'
-            feedbackEl.className = 'text-center font-bold text-lg mb-6'; // Reset CSS para feedback
+            presidentsGuessInputEl.disabled = false;
+            presidentsSubmitGuessBtn.disabled = false;
+            presidentsHintButtons.forEach(button => button.disabled = false);
+            presidentsNewGameButton.classList.add('hidden');
+            presidentsFeedbackEl.className = 'presidents-feedback'; // Reset CSS
         }
 
-        /**
-         * Compara duas strings, permitindo um pequeno número de erros (typos).
-         * Considera similar se a distância de edição for pequena em relação ao tamanho da string mais curta.
-         * @param {string} str1 - Primeira string para comparação.
-         * @param {string} str2 - Segunda string para comparação.
-         * @param {number} toleranceFactor - Fator para determinar a tolerância (ex: 0.2 permite até 20% de erros).
-         * @returns {boolean} - Retorna true se as strings são consideradas similares, false caso contrário.
-         */
         function isCloseEnough(str1, str2, toleranceFactor = 0.2) {
-            if (str1 === str2) return true; // Se forem idênticas, já é suficiente
-            if (str1.length === 0 || str2.length === 0) return false; // Se uma estiver vazia e a outra não
+            if (str1 === str2) return true;
+            if (str1.length === 0 || str2.length === 0) return false;
 
             const longer = str1.length > str2.length ? str1 : str2;
             const shorter = str1.length > str2.length ? str2 : str1;
 
-            // Define a distância máxima de erro permitida baseada no tamanho da string mais curta
             const maxAllowedMismatches = Math.floor(shorter.length * toleranceFactor);
 
             let mismatches = 0;
-            // Conta as diferenças de caracteres nas posições correspondentes
             for (let i = 0; i < shorter.length; i++) {
                 if (shorter[i] !== longer[i]) {
                     mismatches++;
                 }
             }
-            // Adiciona a diferença de comprimento como mais mismatches
             mismatches += (longer.length - shorter.length);
 
             return mismatches <= maxAllowedMismatches;
         }
 
-        /**
-         * Gera o HTML para uma linha do tempo simples a partir do texto do período.
-         * Ex: "1930-1945 (Era Vargas)" -> "1930 --------> 1945 (Era Vargas)"
-         * @param {string} periodoText - O texto do período de governo.
-         * @returns {string} - O HTML formatado como linha do tempo.
-         */
         function generateTimelineHtml(periodoText) {
-            // Expressão regular para capturar os anos e a descrição opcional
             const match = periodoText.match(/^(\d{4})(?:-(\d{4}|presente))?\s*(\(.*\))?$/);
             
             let startYear = '';
@@ -538,17 +1003,14 @@
 
             if (match) {
                 startYear = match[1];
-                endYear = match[2] || ''; // Pode ser undefined se não houver segundo ano
-                description = match[3] || ''; // Pode ser undefined se não houver descrição
+                endYear = match[2] || '';
+                description = match[3] || '';
             } else {
-                // Fallback caso o formato não seja o esperado
                 return `<p>${periodoText}</p>`;
             }
 
-            // Ajusta o texto do ano final se for "presente"
             const displayEndYear = (endYear === 'presente' || endYear === '') ? 'Atualmente' : endYear;
 
-            // Constrói o HTML da linha do tempo
             let timelineHtml = `
                 <div class="timeline-container">
                     <span class="timeline-year">${startYear}</span>
@@ -562,25 +1024,19 @@
             return timelineHtml;
         }
 
-        /**
-         * Verifica o chute do usuário contra o nome do presidente atual,
-         * considerando erros de digitação e nomes parciais.
-         */
-        function checkGuess() {
-            const guess = guessInputEl.value.trim(); // Obtém o chute e remove espaços em branco
+        function checkPresidentsGuess() {
+            const guess = presidentsGuessInputEl.value.trim();
             if (guess === '') {
-                feedbackEl.textContent = 'Por favor, digite um nome antes de adivinhar.';
-                feedbackEl.className = 'text-center font-bold text-lg mb-6 text-orange-600';
+                presidentsFeedbackEl.textContent = 'Por favor, digite um nome antes de adivinhar.';
+                presidentsFeedbackEl.className = 'presidents-feedback text-orange-600';
                 return;
             }
 
-            // Normaliza o nome do presidente (remove acentos, caixa alta/baixa)
-            const normalizedPresidentName = currentPresident.name
-                .normalize("NFD") // Normaliza para decompor caracteres acentuados
-                .replace(/[\u0300-\u036f]/g, "") // Remove diacríticos (acentos)
-                .toLowerCase(); // Converte para minúsculas
+            const normalizedPresidentName = presidentsCurrentPresident.name
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .toLowerCase();
             
-            // Normaliza o chute do usuário da mesma forma
             const normalizedGuess = guess
                 .normalize("NFD")
                 .replace(/[\u0300-\u036f]/g, "")
@@ -588,15 +1044,10 @@
 
             let isCorrect = false;
 
-            // 1. Tenta uma comparação flexível com o nome completo
             if (isCloseEnough(normalizedGuess, normalizedPresidentName)) {
                 isCorrect = true;
             } else {
-                // 2. Se não houver correspondência direta, verifica partes do nome
-                // Divide o nome do presidente em palavras
                 const presidentNameParts = normalizedPresidentName.split(' ');
-
-                // Verifica se o chute é similar a alguma parte do nome (primeiro, último nome, etc.)
                 for (const part of presidentNameParts) {
                     if (isCloseEnough(normalizedGuess, part)) {
                         isCorrect = true;
@@ -606,77 +1057,93 @@
             }
 
             if (isCorrect) {
-                // Exibe o nome do presidente e a frase de legado
-                feedbackEl.innerHTML = `
-                    Correto! O presidente era <span class="text-blue-700">${currentPresident.name}</span>.<br>
-                    <span class="text-gray-600 italic text-base">${currentPresident.legacySummary}</span>
+                presidentsFeedbackEl.innerHTML = `
+                    Correto! O presidente era <span class="text-blue-700">${presidentsCurrentPresident.name}</span>.<br>
+                    <span class="text-gray-600 italic text-base">${presidentsCurrentPresident.legacySummary}</span>
                 `;
-                feedbackEl.className = 'text-center font-bold text-lg mb-6 text-green-600';
+                presidentsFeedbackEl.className = 'presidents-feedback correct';
                 
-                // Exibe a imagem do presidente
-                if (currentPresident.imageUrl) {
-                    presidentImageEl.src = currentPresident.imageUrl;
+                if (presidentsCurrentPresident.imageUrl) {
+                    presidentImageEl.src = presidentsCurrentPresident.imageUrl;
                     presidentImageEl.classList.remove('hidden');
                 }
 
-                // Desabilita apenas a entrada e o botão de adivinhar
-                guessInputEl.disabled = true;
-                submitGuessBtn.disabled = true;
-                // Os botões de dica permanecem habilitados
+                presidentsGuessInputEl.disabled = true;
+                presidentsSubmitGuessBtn.disabled = true;
                 
-                newGameButton.style.display = 'block'; // Mostra o botão para iniciar um novo jogo
+                presidentsNewGameButton.classList.remove('hidden');
             } else {
-                feedbackEl.textContent = 'Errado. Tente novamente ou peça uma dica!';
-                feedbackEl.className = 'text-center font-bold text-lg mb-6 text-red-600';
+                presidentsFeedbackEl.textContent = 'Errado. Tente novamente ou peça uma dica!';
+                presidentsFeedbackEl.className = 'presidents-feedback incorrect';
             }
         }
 
-        /**
-         * Exibe a dica solicitada pelo usuário.
-         * @param {string} hintType - O tipo de dica a ser exibida (periodo, curiosidades, projeto, sofremos).
-         */
-        function showHint(hintType) {
+        function showPresidentsHint(hintType) {
             let hintContent = '';
             switch (hintType) {
                 case 'periodo':
-                    // Usa a nova função para gerar a linha do tempo
-                    hintContent = generateTimelineHtml(currentPresident.periodo);
+                    hintContent = generateTimelineHtml(presidentsCurrentPresident.periodo);
                     break;
                 case 'curiosidades':
-                    hintContent = `Curiosidades: ${currentPresident.curiosidades}`;
+                    hintContent = `Curiosidades: ${presidentsCurrentPresident.curiosidades}`;
                     break;
                 case 'projeto':
-                    hintContent = `Principal Projeto de Governo: ${currentPresident.projeto}`;
+                    hintContent = `Principal Projeto de Governo: ${presidentsCurrentPresident.projeto}`;
                     break;
                 case 'sofremos':
-                    hintContent = `Sofremos Até Hoje: ${currentPresident.sofremos}`;
+                    hintContent = `Sofremos Até Hoje: ${presidentsCurrentPresident.sofremos}`;
                     break;
             }
-            // Define o innerHTML para permitir a renderização da linha do tempo
-            currentHintDisplayEl.innerHTML = hintContent;
+            presidentsCurrentHintDisplayEl.innerHTML = hintContent;
         }
 
-        // Adiciona ouvintes de eventos
-        submitGuessBtn.addEventListener('click', checkGuess); // Botão "Adivinhar"
+        // --- Event Listeners ---
+        // Main Menu Buttons
+        startRevoltsQuizButton.addEventListener('click', () => {
+            showSection('revolts-quiz-section');
+            restartRevoltsQuiz(); // Start the revolts quiz
+        });
 
-        // Permite adivinhar pressionando Enter no campo de entrada
-        guessInputEl.addEventListener('keypress', (event) => {
+        startPresidentsQuizButton.addEventListener('click', () => {
+            showSection('presidents-quiz-section');
+            startPresidentsGame(); // Start the presidents game
+        });
+
+        // Revolts Quiz Buttons
+        revoltsNextButton.addEventListener('click', () => {
+            revoltsCurrentQuestionIndex++;
+            loadRevoltsQuestion();
+        });
+
+        restartRevoltsButton.addEventListener('click', restartRevoltsQuiz);
+
+        backToMenuRevoltsQuizButton.addEventListener('click', () => { // Event listener for the new button
+            showSection('main-menu');
+        });
+
+        // Presidents Quiz Buttons
+        presidentsSubmitGuessBtn.addEventListener('click', checkPresidentsGuess);
+
+        presidentsGuessInputEl.addEventListener('keypress', (event) => {
             if (event.key === 'Enter') {
-                checkGuess();
+                checkPresidentsGuess();
             }
         });
 
-        // Adiciona ouvintes de eventos para todos os botões de dica
-        hintButtons.forEach(button => {
+        presidentsHintButtons.forEach(button => {
             button.addEventListener('click', () => {
-                showHint(button.dataset.hintType); // Usa o atributo data-hint-type para saber qual dica mostrar
+                showPresidentsHint(button.dataset.hintType);
             });
         });
 
-        newGameButton.addEventListener('click', startGame); // Botão "Próximo Presidente"
+        presidentsNewGameButton.addEventListener('click', startPresidentsGame);
 
-        // Inicia o jogo quando a página é carregada
-        window.onload = startGame;
+        backToMenuPresidentsButton.addEventListener('click', () => {
+            showSection('main-menu');
+        });
+
+        // Initial state: show main menu
+        showSection('main-menu');
     </script>
 </body>
 </html>
